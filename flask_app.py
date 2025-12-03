@@ -4,10 +4,12 @@ from flask_sqlalchemy import SQLAlchemy
 import praw, random, os
 from flask_cors import CORS
 
+os.makedirs("instance", exist_ok=True)
+
 app = Flask(__name__)
 CORS(app)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///comments.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///instance/comments.db'
 db = SQLAlchemy(app)
 
 class Commentzzz(db.Model):
@@ -19,8 +21,7 @@ class Commentzzz(db.Model):
     def __repr__(self):
         return f"user={self.username}, comment: {self.comment}, date: {self.date_commented}"
 
-
-@app.route('/', methods=['POST', 'GET'])
+@app.route('/', methods=['POST', 'GET', 'HEAD'])
 def comment():
     if request.method == 'POST':
         username = request.form['Username']
