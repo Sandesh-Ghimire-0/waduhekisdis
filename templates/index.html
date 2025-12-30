@@ -171,15 +171,33 @@
     </div>
 
       <script>
-        const numStars = 200;
-        for (let i = 0; i < numStars; i++) {
-          const star = document.createElement("div");
-          star.className = "stars";
-          star.style.top = Math.random() * window.innerHeight + "px";
-          star.style.left = Math.random() * window.innerWidth + "px";
-          star.style.animationDuration = (Math.random() * 3 + 2) + "s";
-          document.body.appendChild(star);
+        const STAR_COUNT = 250;
+        const stars = document.createElement("div");
+        stars.id = "stars";
+        document.body.appendChild(stars);
+
+        function createStars() {
+          stars.innerHTML = "";
+
+          const width = document.documentElement.scrollWidth;
+          const height = document.documentElement.scrollHeight;
+
+          stars.style.height = height + "px";
+
+          for (let i = 0; i < STAR_COUNT; i++) {
+            const star = document.createElement("div");
+            star.className = "star";
+
+            star.style.left = Math.random() * width + "px";
+            star.style.top = Math.random() * height + "px";
+            star.style.animationDuration = 1.5 + Math.random() * 3 + "s";
+
+            stars.appendChild(star);
+          }
         }
+
+        createStars();
+        window.addEventListener("resize", createStars);
         
         window.onload = function () {
           const container = document.getElementById("COMMENT-AREA");

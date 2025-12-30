@@ -2,14 +2,19 @@ from flask import Flask, render_template, request, redirect, jsonify
 from datetime import datetime,timezone
 from flask_sqlalchemy import SQLAlchemy
 import praw, random, os
-from flask_cors import CORS
+from dotenv import load_dotenv
+from pathlib import Path
 
+
+load_dotenv()
 os.makedirs("instance", exist_ok=True)
 
-app = Flask(__name__)
-CORS(app)
+app = Flask(__name__, instance_relative_config=True)
+Path(app.instance_path).mkdir(parents=True, exist_ok=True)
+app.config["SQLALCHEMY_DATABASE_URI"] = (
+    "sqlite:///" + str(Path(app.instance_path) / "comments.db")
+)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///instance/comments.db'
 db = SQLAlchemy(app)
 
 class Commentzzz(db.Model):
@@ -42,14 +47,16 @@ def comment():
 def gallery():
     return render_template('cat.html')
 
-reddit = praw.Reddit(
-        client_id = os.environ["client_id"],
-        client_secret = os.environ["client_secret"],
-        user_agent="my_app:v1.0 (by u/defiant_speaker)"
-)
+def get_reddit():
+    return praw.Reddit(
+            client_id = os.getenv("CLIENT-ID"),
+            client_secret = os.getenv("CLIENT-SECRET"),
+            user_agent="my_app:v1.0 (by u/defiant_speaker)"
+    )
 
 @app.route('/meme')
 def get_image():
+    reddit = get_reddit()
     subreddit = reddit.subreddit("memes")
     submissions = list(subreddit.hot(limit=100))
     images = [s.url for s in submissions if s.url.endswith((".jpg", ".png", ".gif"))]
